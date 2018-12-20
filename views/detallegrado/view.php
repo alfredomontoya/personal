@@ -25,17 +25,30 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id_detallegrado',
-            'policiaDg.nombre_pol',
-            'gradoDg.nombre_gra',
-            'glosa_dg',
-            'fechaascenso_dg',
-            'fecha_dg',
-            'estado_dg',
-        ],
-    ]) ?>
+    <div class="panel panel-info">
+        <div class="panel-heading"> Datos ascenso grado</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            ['label' => 'ID:', 'attribute' => 'id_detallegrado'],
+                            ['label' => 'Policia:', 'value' => $model->policiaDg->paterno_pol . ' '. $model->policiaDg->materno_pol . ' '. $model->policiaDg->nombre1_pol . ' '. $model->policiaDg->nombre2_pol],
+                            ['label' => 'Codigo grado:', 'value' => 'gradoDg.codigo_gra'],
+                            ['label' => 'Grado:', 'attribute' => 'gradoDg.descripcion_gra'],
+                            ['label' => 'Glosa:', 'attribute' => 'glosa_dg'],
+                            ['label' => 'Fecha ascenso:', 'attribute' => 'fechaascenso_dg'],
+                            ['label' => 'Fecha registro:', 'attribute' => 'fecha_dg'],
+                            ['label' => 'Estado:', 'attribute' => 'estado_dg'],
+                        ],
+                    ]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
 
 </div>

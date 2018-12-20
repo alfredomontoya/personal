@@ -18,6 +18,15 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel-body">
             <?= $this->render('_form', [
                 'model' => $model,
+                'grado' => $grado,
+                'grados' => $grados,
+                'detallegrado' => $detallegrado,
+                'imagen' => $imagen,
+                'departamentos' => $departamentos,
+                'ldepartamentos' => $ldepartamentos,
+                'provincias' => $provincias,
+                'lprovincias' => $lprovincias,
+                'msg' => $msg,
             ]) ?>
         </div>
         <div class="panel-footer">

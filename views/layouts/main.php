@@ -40,13 +40,16 @@ AppAsset::register($this);
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Departamento', 'url' => ['/departamento/index']],
-            ['label' => 'Unidad', 'url' => ['/unidad/index']],
-            ['label' => 'Grado', 'url' => ['/grado/index']],
-            ['label' => 'Cargo', 'url' => ['/cargo/index']],
-            ['label' => 'Policia', 'url' => ['/policia/index']],
+            ['label' => 'Datos Policia', 'url' => ['/policia/index']],
+            ['label' => 'Cambio Cargo', 'url' => ['/cambio/index']],
             ['label' => 'Grado Policia', 'url' => ['/detallegrado/index']],
-            ['label' => 'Cambio', 'url' => ['/cambio/index']],
+            
+            //['label' => 'Departamento', 'url' => ['/departamento/index']],
+            ['label' => 'Comando', 'url' => ['/comando/index']],
+            ['label' => 'Unidad', 'url' => ['/unidad/index']],
+            ['label' => 'Cargo', 'url' => ['/cargo/index']],
+            ['label' => 'Grado', 'url' => ['/grado/index']],
+            
             //['label' => 'Formularios', 'url' => ['/formulario/index']],
             //['label' => 'Formularios Tramite', 'url' => ['/detalleformulario/index']],
             Yii::$app->user->isGuest ? (

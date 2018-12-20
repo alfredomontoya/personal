@@ -31,11 +31,13 @@ class Cambio extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_policia_cam', 'id_cargo_cam', 'fecha_cam', 'estado_cam'], 'required'],
+            [['id_policia_cam', 'id_cargo_cam', 'fecha_cam', 'estado_cam', 'tipo_cam'], 'required'],
             [['id_policia_cam', 'id_cargo_cam'], 'integer'],
             [['fdesignacion_cam', 'fecha_cam'], 'safe'],
             [['glosa_cam'], 'string', 'max' => 512],
             [['estado_cam'], 'string', 'max' => 2],
+            [['id_cargo_cam'], 'exist', 'skipOnError' => true, 'targetClass' => Cargo::className(), 'targetAttribute' => ['id_cargo_cam' => 'id_cargo']],
+            [['id_policia_cam'], 'exist', 'skipOnError' => true, 'targetClass' => Policia::className(), 'targetAttribute' => ['id_policia_cam' => 'id_policia']],
         ];
     }
 
@@ -49,9 +51,29 @@ class Cambio extends \yii\db\ActiveRecord
             'id_policia_cam' => 'Id Policia Cam',
             'id_cargo_cam' => 'Id Cargo Cam',
             'glosa_cam' => 'Glosa Cam',
+            'tipo_cam' => 'Tipo',
             'fdesignacion_cam' => 'Fdesignacion Cam',
             'fecha_cam' => 'Fecha Cam',
             'estado_cam' => 'Estado Cam',
         ];
     }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    
+    public function getCargoCam()
+    {
+        return $this->hasOne(Cargo::className(), ['id_cargo' => 'id_cargo_cam']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    
+    public function getPoliciaCam()
+    {
+        return $this->hasOne(Policia::className(), ['id_policia' => 'id_policia_cam']);
+    }
+    
 }

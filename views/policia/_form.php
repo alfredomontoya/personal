@@ -2,15 +2,47 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+use yii\jui\AutoComplete;
+use yii\jui\DatePicker;
+use yii\helpers\ArrayHelper;
+use kartik\widgets\FileInput;
 /* @var $this yii\web\View */
 /* @var $model app\models\Policia */
 /* @var $form yii\widgets\ActiveForm */
+$this->registerJs(
+    ""
+    ."$('#imagen-archivo').change(function(e) {
+        addImage(e); 
+     });"
+    ."function addImage(e){
+      var file = e.target.files[0],
+      imageType = /image.*/;
+    
+      if (!file.type.match(imageType))
+       return;
+  
+      var reader = new FileReader();
+      reader.onload = fileOnload;
+      reader.readAsDataURL(file);
+     }
+  
+     function fileOnload(e) {
+      var result=e.target.result;
+      $('#output').attr('src',result);
+     }"    
+    . "",
+ yii\web\View::POS_READY,
+    'my-button-handler'
+);
 ?>
 
 <div class="policia-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        "method" => "post",
+        "enableClientValidation" => true,
+        "options" => ["enctype" => "multipart/form-data"],
+    ]); ?>
     <div class="panel panel-primary">
         <div class="panel-heading">
             Datos Policia
@@ -19,21 +51,43 @@ use yii\widgets\ActiveForm;
             <div class="row">
                 <div class="col-md-4">
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-7">
                             <?= $form->field($model, 'escalafon_pol')->textInput(['maxlength' => true])->label('Escalafon:') ?>
                         </div>
-                        <div class="col-md-4">
-                            <?= $form->field($model, 'expescalafon_pol')->textInput(['maxlength' => true])->label("Exp. Esc:") ?>
+                        <div class="col-md-5">
+                            <?= $form->field($model,'expescalafon_pol')->dropDownList([
+                                            'prompt' => 'Seleccione expedido',
+                                        'BE'=>'BENI',
+                                        'SC'=>'SANTACRUZ',
+                                        'PA'=>'PANDO',
+                                        'LP'=>'LA PAZ',
+                                        'OR'=>'ORURO',
+                                        'PO'=>'POTOSI',
+                                        'CO'=>'COCHABAMBA',
+                                        'TA'=>'TARIJA',
+                                        'CH'=>'CHUQUISACA',
+                                    ])->label('Exp'); ?>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                      <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-7">
                             <?= $form->field($model, 'ci_pol')->textInput(['maxlength' => true])->label('Cedula Identidad:') ?>
                         </div>
-                        <div class="col-md-4">
-                            <?= $form->field($model, 'exp_pol')->textInput(['maxlength' => true])->label('Exp:') ?>
+                        <div class="col-md-5">
+                            <?= $form->field($model,'exp_pol')->dropDownList([
+                                            'prompt' => 'Seleccione expedido',
+                                        'BE'=>'BENI',
+                                        'SC'=>'SANTACRUZ',
+                                        'PA'=>'PANDO',
+                                        'LP'=>'LA PAZ',
+                                        'OR'=>'ORURO',
+                                        'PO'=>'POTOSI',
+                                        'CO'=>'COCHABAMBA',
+                                        'TA'=>'TARIJA',
+                                        'CH'=>'CHUQUISACA',
+                                    ])->label('Exp'); ?>
                         </div>
                     </div>
                 </div>
@@ -59,16 +113,46 @@ use yii\widgets\ActiveForm;
             
             <div class="row">
                 <div class="col-md-3">
-                    <?= $form->field($model, 'sexo_pol')->textInput(['maxlength' => true])->label('Sexo:') ?>
+                    <?= $form->field($model,'sexo_pol')->dropDownList([
+                                            'prompt' => 'Seleccionar sexo',
+                                        'M'=>'MASCULINO',
+                                        'F'=>'FEMENINO',
+                                    ])->label('Sexo:'); ?>
                 </div>
                 <div class="col-md-3">
-                    <?= $form->field($model, 'fnacimiento_pol')->textInput()->label('Fecha nacimiento:') ?>
+                    <?= $form->field($model, 'fnacimiento_pol')->input('date')->label('Fecha nacimiento:') ?>
                 </div>
                 <div class="col-md-3">
-                    <?= $form->field($model, 'dptonacimiento_pol')->textInput(['maxlength' => true])->label('Departamento Nacimiento:') ?>
+                    <?= $form->field($model, 'dptonacimiento_pol')->dropDownList(
+                            $ldepartamentos, 
+                            [
+                               'prompt'=>'-Seleccione departamento-',
+                               'onchange'=>'
+                                    $.post("'.Yii::$app->urlManager->createUrl(['policia/provincias', 'id' => '']).'"+$(this).val(), function(data) {
+                                       $("#policia-provnacimiento_pol").html(data);
+                                    });
+                                   ',
+                                
+                            ]
+                        );  
+                    ?>
+                    <?php //Html::activeHiddenInput($model, "dptonacimiento_pol") ?>
+                    <?php // $form->field($model, 'dptonacimiento_pol')->textInput(['maxlength' => true])?>
                 </div>
                 <div class="col-md-3">
-                    <?= $form->field($model, 'provnacimiento_pol')->textInput(['maxlength' => true])->label('Provincia Nacimiento:') ?>
+                    <?= $form->field($model, 'provnacimiento_pol')->dropDownList(
+                            $lprovincias,           
+                            [
+                                'prompt'=>'-Seleccione un provincia-',
+                                'onchange'=>'
+                                    $.post("'.Yii::$app->urlManager->createUrl(['policia/seleccionarprovincia', 'id' => '']).'"+$(this).val(), function(data) {
+                                       //$("#policia-provnacimiento_pol").val(data);
+                                       //$("#departamento-id_departamento").val(10);
+                                    });
+                                   '
+                            ]
+                        );
+                    ?>
                 </div>
             </div>
             
@@ -77,7 +161,7 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'locanacimiento_pol')->textInput(['maxlength' => true])->label('Localidad Nacimiento:') ?>
                 </div>
                 <div class="col-md-3">
-                    <?= $form->field($model, 'fincorporacion_pol')->textInput()->label('Fecha incorporacion:') ?>
+                    <?= $form->field($model, 'fincorporacion_pol')->input('date')->label('Fecha incorporacion:') ?>
                 </div>
                 <div class="col-md-3">
                     <?= $form->field($model, 'telefono_pol')->textInput(['maxlength' => true])->label('Telefono:') ?>
@@ -89,13 +173,87 @@ use yii\widgets\ActiveForm;
             
             <div class="row">
                 <div class="col-md-3">
-                    <?= $form->field($model, 'fpresentacion_pol')->textInput()->label('Fecha presentacion:') ?>
+                    <?= $form->field($model, 'fpresentacion_pol')->input('date')->label('Fecha presentacion:') ?>
                 </div>
                 <div class="col-md-2">
-                    <?= $form->field($model, 'trabajosantacruz_pol')->textInput(['maxlength' => true])->label('Trab. en Santa Cruz?:') ?>
+                    <?= $form->field($model,'trabajosantacruz_pol')->dropDownList([
+                                            'prompt' => 'Seleccionar',
+                                        'SI'=>'SI',
+                                        'NO'=>'NO',
+                                    ])->label('Trab. en Santa Cruz?'); ?>
                 </div>
                 <div class="col-md-7">
                     <?= $form->field($model, 'direccion_pol')->textInput(['maxlength' => true])->label('Direccion:') ?>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($imagen, 'archivo')->widget(
+                        FileInput::className(),
+                        [
+                            'name' => 'attachments', 
+                            'options' => [
+                                'multiple' => false,
+                                'accept' => 'image/*'
+                                ], 
+                            'pluginOptions' => ['previewFileType' => 'any']
+                        ]
+                        ) ?>
+                </div>
+                <div class="col-md-6">
+                    
+                </div>
+                
+            </div>
+            
+            
+        </div>
+    </div>
+    
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            Grado 
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                            <?= $form->field($grado, 'descripcion_gra')->widget(AutoComplete::classname(), [
+                                'value' =>'helo',
+                            'clientOptions' => [
+                                    'source' => $grados,
+                                    'minLength' => '1',
+                                    'autoFill'=>true,
+                                    'label'=>'',
+                                    'select' => new \yii\web\JsExpression ("function( event, ui ) { "
+                                            . "$('#detallegrado-id_grado_dg').val(ui.item.id); "
+                                            . "$('#grado-codigo_gra').val(ui.item.codigo_gra); "
+                                            
+                                            . "}"),
+                                ],
+                                'options' => [
+                                    'class' => 'form-control',
+                                    //'value'=>$grados->id_grado,
+                                ],
+                            ]) ?>
+                </div>
+                <div class="col-md-4">
+                    <?= $form->field($grado, 'codigo_gra')->textInput(['maxlength' => true, 'readonly'=> true])->label('Codigo Grado:') ?>
+                </div>
+                <div class="col-md-4">
+                    <?= Html::activeHiddenInput($detallegrado, "id_grado_dg") ?>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <?= $form->field($detallegrado, 'fechaascenso_dg')->input('date')->label("Fecha Ascenso:") ?>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <?= $form->field($detallegrado, 'glosa_dg')->textarea(['rows' => 3])->label('Glosa:') ?>
                 </div>
             </div>
             <div class="row">
@@ -107,83 +265,6 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
     </div>
-    
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            Grado
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'escalafon_pol')->textInput(['maxlength' => true])->label('Grado:') ?>
-                        </div>
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'expescalafon_pol')->textInput(['maxlength' => true])->label("Fecha Grado:") ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                     <div class="row">
-                        <div class="col-md-12">
-                            <?= $form->field($model, 'ci_pol')->textInput(['maxlength' => true])->label('Glosa:') ?>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-    
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            Puesto
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'escalafon_pol')->textInput(['maxlength' => true])->label('Departamento:') ?>
-                        </div>
-                        <div class="col-md-6">
-                            <?= $form->field($model, 'expescalafon_pol')->textInput(['maxlength' => true])->label("Unidad:") ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                     <div class="row">
-                        <div class="col-md-12">
-                            <?= $form->field($model, 'ci_pol')->textInput(['maxlength' => true])->label('Cargo:') ?>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <?= $form->field($model, 'escalafon_pol')->textInput(['maxlength' => true])->label('Fecha designacion:') ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                     <div class="row">
-                        <div class="col-md-12">
-                            <?= $form->field($model, 'ci_pol')->textInput(['maxlength' => true])->label('Glosa:') ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-    </div>
-    
-
     <?php ActiveForm::end(); ?>
 
 </div>

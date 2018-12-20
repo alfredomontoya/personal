@@ -52,8 +52,12 @@ class Cargo extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    
     public function getUnidadCar()
     {
         return $this->hasOne(Unidad::className(), ['id_unidad' => 'id_unidad_car']);
     }
+    
+    
+    
 }

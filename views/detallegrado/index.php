@@ -26,25 +26,25 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id_detallegrado',
-            [
-                'header' => 'Grado',
-                'format' => 'raw',
-                'value' => 'id_grado_dg'
-            ],
-            [
-                'header' => 'Nombres y apellidos',
-                'format' => 'raw',
-                'value'=>function ($model) {
-                    return $model->policiaDg->nombre1_pol . ' ' . $model->policiaDg->paterno_pol;
-                },
-            ],
+            //'id_policia_dg',
+            //'id_grado_dg',
+            //['header' => 'Escalafón',   'attribute' => 'escalafon_pol', 'value' => 'policiaDg.escalafon_pol'],
+            ['header' => 'CI',          'attribute' => 'ci_pol', 'value' => 'policiaDg.ci_pol'],
+            ['header' => 'Ap. paterno', 'attribute' => 'paterno_pol', 'value' => 'policiaDg.paterno_pol'],
+            ['header' => 'Ap. paterno', 'attribute' => 'materno_pol', 'value' => 'policiaDg.materno_pol'],
+            ['header' => 'Ap. paterno', 'attribute' => 'nombre1_pol', 'value' => 'policiaDg.nombre1_pol'],
+            ['header' => 'Ap. paterno', 'attribute' => 'nombre2_pol', 'value' => 'policiaDg.nombre2_pol'],
+            //'policiaDg.ci_pol',
             'gradoDg.descripcion_gra',
-            'glosa_dg',
-            'fechaascenso_dg',
+            //'glosa_dg',
+            //'fechaascenso_dg',
             //'fecha_dg',
-            //'estado_dg',
+            'estado_dg',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update}',
+            ],
         ],
     ]); ?>
 </div>

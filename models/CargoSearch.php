@@ -12,6 +12,8 @@ use app\models\Cargo;
  */
 class CargoSearch extends Cargo
 {
+    public $nombre_uni;
+    
     /**
      * {@inheritdoc}
      */
@@ -20,6 +22,7 @@ class CargoSearch extends Cargo
         return [
             [['id_cargo', 'id_unidad_car'], 'integer'],
             [['nombre_car', 'estado_car'], 'safe'],
+            [['nombre_uni', ], 'safe'],
         ];
     }
 
@@ -42,6 +45,8 @@ class CargoSearch extends Cargo
     public function search($params)
     {
         $query = Cargo::find();
+        
+        $query->joinWith('unidadCar');
 
         // add conditions that should always apply here
 
@@ -64,7 +69,9 @@ class CargoSearch extends Cargo
         ]);
 
         $query->andFilterWhere(['like', 'nombre_car', $this->nombre_car])
-            ->andFilterWhere(['like', 'estado_car', $this->estado_car]);
+            ->andFilterWhere(['like', 'estado_car', $this->estado_car])
+            ->andFilterWhere(['like', 'unidad.nombre_uni', $this->nombre_uni])
+                ;
 
         return $dataProvider;
     }

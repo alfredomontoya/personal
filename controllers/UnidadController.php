@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Unidad;
-use app\modelsUnidadSearch;
+use app\models\UnidadSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -35,7 +35,7 @@ class UnidadController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new modelsUnidadSearch();
+        $searchModel = new UnidadSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [

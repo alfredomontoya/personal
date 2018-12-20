@@ -46,8 +46,8 @@ class Policia extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['escalafon_pol', 'expescalafon_pol', 'ci_pol', 'exp_pol', 'paterno_pol', 'nombre1_pol', 'nombre2_pol', 'sexo_pol', 'fnacimiento_pol', 'estado_pol'], 'required'],
-            [['fnacimiento_pol', 'fincorporacion_pol', 'fpresentacion_pol'], 'safe'],
+            [['expescalafon_pol', 'ci_pol', 'exp_pol', 'paterno_pol', 'nombre1_pol', 'sexo_pol', 'fnacimiento_pol', 'estado_pol'], 'required'],
+            [['escalafon_pol', 'fnacimiento_pol', 'fincorporacion_pol', 'fpresentacion_pol'], 'safe'],
             [['escalafon_pol', 'ci_pol', 'telefono_pol', 'telefonoref_pol'], 'string', 'max' => 16],
             [['expescalafon_pol', 'exp_pol', 'sexo_pol', 'trabajosantacruz_pol'], 'string', 'max' => 4],
             [['paterno_pol', 'materno_pol', 'esposo_pol', 'nombre1_pol', 'nombre2_pol'], 'string', 'max' => 32],
@@ -87,4 +87,10 @@ class Policia extends \yii\db\ActiveRecord
             'estado_pol' => 'Estado Pol',
         ];
     }
+    
+    public function getCambiosPol()
+    {
+        return $this->hasMany(Cambio::className(), ['id_policia_cam' => 'id_policia']);
+    }
+    
 }

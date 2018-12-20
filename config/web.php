@@ -43,6 +43,7 @@ $config = [
                 ],
             ],
         ],
+        
         'db' => $db,
         /*
         'urlManager' => [
@@ -61,6 +62,11 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
+        // uncomment the following to add your IP if you are not connecting from localhost.
+        //'allowedIPs' => ['127.0.0.1', '::1'],
+    ];
+    $config['modules']['gridview'] = [
+        'class' => '\kartik\grid\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];

@@ -25,22 +25,23 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['login', 'logout', 'signup', 'about', 'departamento/site'],
+                'only' => ['login', 'logout', 'signup', 'about'],
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['login', 'signup'],
+                        'actions' => ['login', 'signup', 'about'],
                         'roles' => ['?'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['logout', 'about','departamento/site'],
+                        'actions' => ['logout',],
                         'roles' => ['@'],
                     ],
                 ],
                 'denyCallback' => function ($rule, $action) {
-        throw new \Exception('No tienes los suficientes permisos para acceder a esta página');
-    }
+                    throw new \Exception('No tienes los suficientes permisos para acceder a esta página');
+                    //$this->render('site/login');
+                }
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),

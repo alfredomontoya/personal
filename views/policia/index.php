@@ -48,7 +48,12 @@ $this->params['breadcrumbs'][] = $this->title;
             //'direccion_pol',
             //'estado_pol',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'header' => 'Actions',
+                'headerOptions' => ['style' => 'color:#337ab7'],
+                'template' => '{view} {update}',
+            ],
         ],
     ]); ?>
 </div>

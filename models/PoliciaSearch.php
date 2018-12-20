@@ -12,6 +12,7 @@ use app\models\Policia;
  */
 class PoliciaSearch extends Policia
 {
+    public $nombre_uni;
     /**
      * {@inheritdoc}
      */
@@ -20,6 +21,7 @@ class PoliciaSearch extends Policia
         return [
             [['id_policia'], 'integer'],
             [['escalafon_pol', 'expescalafon_pol', 'ci_pol', 'exp_pol', 'paterno_pol', 'materno_pol', 'esposo_pol', 'nombre1_pol', 'nombre2_pol', 'sexo_pol', 'fnacimiento_pol', 'dptonacimiento_pol', 'provnacimiento_pol', 'locanacimiento_pol', 'fincorporacion_pol', 'telefono_pol', 'telefonoref_pol', 'fpresentacion_pol', 'trabajosantacruz_pol', 'direccion_pol', 'estado_pol'], 'safe'],
+            [['nombre_uni',], 'safe'],
         ];
     }
 

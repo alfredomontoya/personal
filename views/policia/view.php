@@ -24,33 +24,91 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id_policia',
-            'escalafon_pol',
-            'expescalafon_pol',
-            'ci_pol',
-            'exp_pol',
-            'paterno_pol',
-            'materno_pol',
-            'esposo_pol',
-            'nombre1_pol',
-            'nombre2_pol',
-            'sexo_pol',
-            'fnacimiento_pol',
-            'dptonacimiento_pol',
-            'provnacimiento_pol',
-            'locanacimiento_pol',
-            'fincorporacion_pol',
-            'telefono_pol',
-            'telefonoref_pol',
-            'fpresentacion_pol',
-            'trabajosantacruz_pol',
-            'direccion_pol',
-            'estado_pol',
-        ],
-    ]) ?>
-
+    <div class="panel panel-info">
+        <div class="panel-heading">Datos policia</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            ['label' => 'ID:', 'attribute' => 'id_policia'],
+                            ['label' => 'Escalafón:', 'attribute' => 'escalafon_pol'],
+                            ['label' => 'Exp. escalafón:', 'attribute' => 'expescalafon_pol'],
+                            ['label' => 'CI:', 'attribute' => 'ci_pol'],
+                            ['label' => 'Exp. ci:', 'attribute' => 'exp_pol'],
+                            ['label' => 'Ap. Paterno:', 'attribute' => 'paterno_pol'],
+                            ['label' => 'Ap. Materno:', 'attribute' => 'materno_pol'],
+                            ['label' => 'Ap. Esposo:', 'attribute' => 'esposo_pol'],
+                            ['label' => 'Primer nombre:', 'attribute' => 'nombre1_pol'],
+                            ['label' => 'Segundo nombre:', 'attribute' => 'nombre2_pol'],
+                            ['label' => 'Sexo:', 'attribute' => 'sexo_pol'],
+                            ['label' => 'Fecha nacimiento:', 'attribute' => 'fnacimiento_pol'],
+                            ['label' => 'Departamento nac:', 'attribute' => 'dptonacimiento_pol'],
+                            ['label' => 'Provincia nac.:', 'attribute' => 'provnacimiento_pol'],
+                            ['label' => 'Localidad nac:', 'attribute' => 'locanacimiento_pol'],
+                            ['label' => 'Fecha de incoporación:', 'attribute' => 'fincorporacion_pol'],
+                            ['label' => 'Teléfono:', 'attribute' => 'telefono_pol'],
+                            ['label' => 'Teléfono de referencia:', 'attribute' => 'telefonoref_pol'],
+                            ['label' => 'Trabajó en Santa Cruz?:', 'attribute' => 'trabajosantacruz_pol'],
+                            ['label' => 'Dirección:', 'attribute' => 'direccion_pol'],
+                            ['label' => 'Estado:', 'attribute' => 'estado_pol'],
+                        ],
+                    ]) ?>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">Foto</div>
+                        <div class="panel-body">
+                            <?= Html::img('@web/policias/'.$model->id_policia.'_foto.jpg', ['alt'=>'some', 'class'=>'thing', 'width' => '200']);?> 
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    
+    <div class="panel panel-info">
+        <div class="panel-heading">Historial de grados</div>
+        <div class="panel-body">
+            <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Id</th>
+              <th scope="col">id_policia</th>
+              <th scope="col">id_grado</th>
+              <th scope="col">codigo</th>
+              <th scope="col">grado</th>
+              <th scope="col">fecha</th>
+              <th scope="col">estado</th>
+            </tr>
+          </thead>
+          <tbody>
+              <?php 
+              $nro = 1;
+              foreach ($detallegrado as $i => $detalle) : ?>
+                <tr>
+                    <td><?= $nro ?> </td>
+                    <td><?= $detalle->id_detallegrado ?> </td>
+                    <td><?= $detalle->id_policia_dg ?> </td>
+                    <td><?= $detalle->id_grado_dg ?> </td>
+                    <td><?= $detalle->gradoDg->codigo_gra ?> </td>
+                    <td><?= $detalle->gradoDg->descripcion_gra ?> </td>
+                    <td><?= $detalle->fecha_dg ?> </td>
+                    <td><?= $detalle->estado_dg ?> </td>
+                    <?php $nro++; ?>
+                </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+        </div>
+    </div>
+    
+    
 </div>
