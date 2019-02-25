@@ -43,13 +43,21 @@ class UnidadSearch extends Unidad
      */
     public function search($params)
     {
-        $query = Unidad::find();///->joinWith(['comandoUni']);
+        $query = Unidad::find();
+        
+        $query->join('LEFT OUTER JOIN', 'comando', 'unidad.id_comando_uni = comando.id_comando')
+                ;
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+        
+        $dataProvider->sort->attributes['nombre_com'] = [
+            'asc' => ['comando.nombre_com' => SORT_ASC], 
+            'desc' => ['comando.nombre_com' => SORT_DESC]
+            ];
 
         $this->load($params);
 
@@ -68,7 +76,7 @@ class UnidadSearch extends Unidad
         $query->andFilterWhere(['like', 'codigo_uni', $this->codigo_uni])
             ->andFilterWhere(['like', 'nombre_uni', $this->nombre_uni])
             ->andFilterWhere(['like', 'estado_uni', $this->estado_uni])
-            //->andFilterWhere(['like', 'comando.nombre_com', $this->nombre_com])
+            ->andFilterWhere(['like', 'comando.nombre_com', $this->nombre_com])
                 ;
 
         return $dataProvider;

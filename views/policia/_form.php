@@ -68,6 +68,7 @@ $this->registerJs(
                                         'CH'=>'CHUQUISACA',
                                     ])->label('Exp'); ?>
                         </div>
+                        
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -175,13 +176,7 @@ $this->registerJs(
                 <div class="col-md-3">
                     <?= $form->field($model, 'fpresentacion_pol')->input('date')->label('Fecha presentacion:') ?>
                 </div>
-                <div class="col-md-2">
-                    <?= $form->field($model,'trabajosantacruz_pol')->dropDownList([
-                                            'prompt' => 'Seleccionar',
-                                        'SI'=>'SI',
-                                        'NO'=>'NO',
-                                    ])->label('Trab. en Santa Cruz?'); ?>
-                </div>
+                
                 <div class="col-md-7">
                     <?= $form->field($model, 'direccion_pol')->textInput(['maxlength' => true])->label('Direccion:') ?>
                 </div>
@@ -189,12 +184,12 @@ $this->registerJs(
             
             <div class="row">
                 <div class="col-md-6">
-                    <?= $form->field($imagen, 'archivo')->widget(
+                    <?= $form->field($imagen, 'archivo[]')->widget(
                         FileInput::className(),
                         [
                             'name' => 'attachments', 
                             'options' => [
-                                'multiple' => false,
+                                'multiple' => true,
                                 'accept' => 'image/*'
                                 ], 
                             'pluginOptions' => ['previewFileType' => 'any']
@@ -202,69 +197,62 @@ $this->registerJs(
                         ) ?>
                 </div>
                 <div class="col-md-6">
-                    
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div id="mdb-lightbox-ui"></div>
+
+                            <div class="mdb-lightbox">
+                                <?php
+                                    //$dir = \yii\helpers\Url::to('@web');
+                                    //Yii::warning($dir);
+                                    //$directorio = opendir('/web/policias'); //ruta actual
+                                    $files=\yii\helpers\FileHelper::findFiles($directorio, ['only' => [$model->id_policia . '_*.*']]); 
+                                    foreach ($files as $file){
+                                        $nameFicheiro = substr($file, strrpos($file, '/')); 
+                                        echo '<figure class="col-md-4">';
+                                        echo Html::a(
+                                                $nameFicheiro.
+                                                Html::img(
+                                                        $nameFicheiro, 
+                                                        [
+                                                            'alt' => 'placeholder',
+                                                            'class' => 'img-fluid',
+                                                        ]), 
+                                                $nameFicheiro,
+                                                ['data-size'=>'1600x1067']
+                                                ) ; // render do ficheiro no browser 
+                                                //<a href=../web/policias/'.$nameFicheiro.' data-size="1600x1067">
+                                                //    <img src=../web/policias/'.$nameFicheiro.'  alt="placeholder" class="img-fluid">
+                                                //</a>
+                                        echo '</figure>';
+                                    }
+                              
+                                ?>
+                            
+
+                          </div>
+
+                        </div>
+                      </div>
                 </div>
                 
             </div>
             
             
+            
         </div>
     </div>
     
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            Grado 
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-4">
-                            <?= $form->field($grado, 'descripcion_gra')->widget(AutoComplete::classname(), [
-                                'value' =>'helo',
-                            'clientOptions' => [
-                                    'source' => $grados,
-                                    'minLength' => '1',
-                                    'autoFill'=>true,
-                                    'label'=>'',
-                                    'select' => new \yii\web\JsExpression ("function( event, ui ) { "
-                                            . "$('#detallegrado-id_grado_dg').val(ui.item.id); "
-                                            . "$('#grado-codigo_gra').val(ui.item.codigo_gra); "
-                                            
-                                            . "}"),
-                                ],
-                                'options' => [
-                                    'class' => 'form-control',
-                                    //'value'=>$grados->id_grado,
-                                ],
-                            ]) ?>
-                </div>
-                <div class="col-md-4">
-                    <?= $form->field($grado, 'codigo_gra')->textInput(['maxlength' => true, 'readonly'=> true])->label('Codigo Grado:') ?>
-                </div>
-                <div class="col-md-4">
-                    <?= Html::activeHiddenInput($detallegrado, "id_grado_dg") ?>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-4">
-                    <?= $form->field($detallegrado, 'fechaascenso_dg')->input('date')->label("Fecha Ascenso:") ?>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-4">
-                    <?= $form->field($detallegrado, 'glosa_dg')->textarea(['rows' => 3])->label('Glosa:') ?>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-                    </div>
-                </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <?= Html::submitButton('Registrar', ['class' => 'btn btn-success']) ?>
+                <?= Html::a('Cancelar',['index'], ['class' => 'btn btn-warning']) ?>
             </div>
         </div>
     </div>
+
     <?php ActiveForm::end(); ?>
 
 </div>

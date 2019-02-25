@@ -31,11 +31,11 @@ class Cambio extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_policia_cam', 'id_cargo_cam', 'fecha_cam', 'estado_cam', 'tipo_cam'], 'required'],
+            [['id_policia_cam', 'id_cargo_cam', 'fecha_cam', 'estado_cam', 'tipo_cam', 'fdesignacion_cam',], 'required'],
             [['id_policia_cam', 'id_cargo_cam'], 'integer'],
-            [['fdesignacion_cam', 'fecha_cam'], 'safe'],
+            [[ 'fecha_cam'], 'safe'],
             [['glosa_cam'], 'string', 'max' => 512],
-            [['estado_cam'], 'string', 'max' => 2],
+            [['tipo_cam', 'estado_cam'], 'string', 'max' => 2],
             [['id_cargo_cam'], 'exist', 'skipOnError' => true, 'targetClass' => Cargo::className(), 'targetAttribute' => ['id_cargo_cam' => 'id_cargo']],
             [['id_policia_cam'], 'exist', 'skipOnError' => true, 'targetClass' => Policia::className(), 'targetAttribute' => ['id_policia_cam' => 'id_policia']],
         ];

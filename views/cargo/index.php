@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 //use yii\grid\GridView;
 use kartik\grid\GridView;
+use kartik\export\ExportMenu;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\CargoSearch */
@@ -12,55 +13,71 @@ $this->title = 'Cargos';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="cargo-index">
+    <div class="container">
+        <!--<h1><?= Html::encode($this->title) ?></h1>-->
+        <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <p>
-        <?= Html::a('Create Cargo', ['create'], ['class' => 'btn btn-success']) ?> 
-    </p>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-            [
-                'class' => 'kartik\grid\ExpandRowColumn',
-                'width' => '50px',
-                'value' => function ($model, $key, $index, $column){
-                    return kartik\grid\GridView::ROW_COLLAPSED;
-                },
-                'detail' => function ($model, $key, $index, $column){
-                    //$searchModel = new \app\models\UnidadSearch();
-                    //$searchModel->id_unidad = $model->id_unidad_com;
-                    //$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-                    $searchModel = new app\models\CambioSearch();
-                    $searchModel->id_cargo_cam = $model->id_cargo;
-                    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-                    return Yii::$app->controller->renderPartial (
-                            'detailcambios', 
-                            [
-                                //'searchModel' => $searchModel,
-                            'dataProvider' => $dataProvider,
-                            ]
-                    );
-
-                },
-            ],
-
-            'id_cargo',
-            [
-                'label' => 'Unidad',
-                'attribute' => 'nombre_uni',
-                'value' => 'unidadCar.nombre_uni'
+       
+        <?php
+            $gridColumns = [
+                ['class' => 'yii\grid\SerialColumn'],
+                ['label' => 'ID', 'attribute' => 'id_cargo', 'value' => 'id_cargo', 'width' => '100px',],
+                ['label' => 'Unidad', 'attribute' => 'nombre_uni', 'value' => 'unidadCar.nombre_uni', 'width' => 'px',],
+                ['label' => 'Cargo', 'attribute' => 'nombre_car', 'value' => 'nombre_car', 'width' => '',],
+                ['label' => 'Estado', 'attribute' => 'estado_car', 'value' => 'estado_car', 'width' => '100px',],
+                ['class' => 'yii\grid\ActionColumn', 'template' => '{view}{update}'],
+            ];
+            
+            $fullExportMenu = ExportMenu::widget([
+                'dataProvider' => $dataProvider,
+                'columns' => $gridColumns,
+                'target' => ExportMenu::TARGET_BLANK,
+                'pjaxContainerId' => 'kv-pjax-container',
+                'exportContainer' => [
+                    'class' => 'btn-group mr-2'
                 ],
-            'nombre_car',
-            'estado_car',
+                'dropdownOptions' => [
+                    'label' => 'Exportar',
+                    'class' => 'btn btn-secondary',
+                    'itemsBefore' => [
+                        '<div class="dropdown-header">Exportar todos los datos</div>',
+                    ],
+                ],
+            ]);
+            
+        ?>
+        
 
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+        <?= GridView::widget([
+            'filterModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'columns' => $gridColumns,
+            'pjax' => true,
+            'pjaxSettings' => ['options' => ['id' => 'kv-pjax-container']],
+            'panel' => [
+                'type' => GridView::TYPE_INFO,
+                'heading' => '<h3 class="panel-title"><i class="fas fa-book"></i>'. Html::encode($this->title) .'</h3>',
+            ],
+            // set a label for default menu
+            'export' => [
+                'label' => 'Export. Pag',
+            ],
+            'exportContainer' => [
+                'class' => 'btn-group mr-2'
+            ],
+            // your toolbar can include the additional full export menu
+            'toolbar' => [
+                [
+                    'content'=>
+                        Html::a('Inicio', ['/site/index'], ['class' => 'btn btn-primary']) .
+                        ((Yii::$app->user->can('cargo-create'))? Html::a('Registrar', ['create'], ['class' => 'btn btn-success']):'').
+                        Html::a('<i class="fas fa-redo"></i>', ['index'], ['class' => 'btn btn-primary'])
+                    ,    
+                    'options' => ['class' => 'btn-group']
+                ],
+                //'{export}',
+                ((Yii::$app->user->can('cargo-exportar'))? $fullExportMenu:[]),
+            ]
+        ]); ?>
+    </div>
 </div>

@@ -1,7 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
+use kartik\export\ExportMenu;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PoliciaSearch */
@@ -11,49 +12,97 @@ $this->title = 'Policias';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="policia-index">
+    <div class="container">
+        
+    
+        <?php
+            $gridColumns = [
+                ['class' => 'yii\grid\SerialColumn'],
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                [
+                    'label'=>'ID',
+                    'attribute'=>'id_policia',
+                    'width' => '80px'
+                ],
+                [
+                    'label'=>'C.I.',
+                    'attribute'=>'ci_pol',
+                    'width' => '100px'
+                ],
+                [
+                    'label'=>'Expedido',
+                    'attribute'=>'exp_pol',
+                    'width' => '80px'
+                ],
+                'paterno_pol',
+                'materno_pol',
+                'nombre1_pol',
+                'nombre2_pol',
+                [
+                    'label'=>'Sexo',
+                    'attribute'=>'sexo_pol',
+                    'width' => '80px'
+                ],
+                
 
-    <p>
-        <?= Html::a('Create Policia', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'header' => 'Actions',
+                    'headerOptions' => ['style' => 'color:#337ab7'],
+                    'template' => '{view} {update}',
+                ],
+            ];
+            
+            $fullExportMenu = ExportMenu::widget([
+                'dataProvider' => $dataProvider,
+                'columns' => $gridColumns,
+                'target' => ExportMenu::TARGET_BLANK,
+                'pjaxContainerId' => 'kv-pjax-container',
+                'exportContainer' => [
+                    'class' => 'btn-group mr-2'
+                ],
+                'dropdownOptions' => [
+                    'label' => 'Exportar',
+                    'class' => 'btn btn-secondary',
+                    'itemsBefore' => [
+                        '<div class="dropdown-header">Exportar todos los datos</div>',
+                    ],
+                ],
+            ]);
+            
+        ?>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id_policia',
-            //'escalafon_pol',
-            //'expescalafon_pol',
-            'ci_pol',
-            'exp_pol',
-            'paterno_pol',
-            'materno_pol',
-            //'esposo_pol',
-            'nombre1_pol',
-            'nombre2_pol',
-            'sexo_pol',
-            //'fnacimiento_pol',
-            //'dptonacimiento_pol',
-            //'provnacimiento_pol',
-            //'locanacimiento_pol',
-            //'fincorporacion_pol',
-            //'telefono_pol',
-            //'telefonoref_pol',
-            //'fpresentacion_pol',
-            //'trabajosantacruz_pol',
-            //'direccion_pol',
-            //'estado_pol',
-
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'header' => 'Actions',
-                'headerOptions' => ['style' => 'color:#337ab7'],
-                'template' => '{view} {update}',
+        
+        <?= GridView::widget([
+            'filterModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'columns' => $gridColumns,
+            'pjax' => true,
+            'pjaxSettings' => ['options' => ['id' => 'kv-pjax-container']],
+            'panel' => [
+                'type' => GridView::TYPE_INFO,
+                'heading' => '<h1 class="panel-title"><i class="fas fa-book"></i>'. Html::encode($this->title) .'</h2>',
             ],
-        ],
-    ]); ?>
+            // set a label for default menu
+            'export' => [
+                'label' => 'Export. Pag',
+            ],
+            'exportContainer' => [
+                'class' => 'btn-group mr-2'
+            ],
+            // your toolbar can include the additional full export menu
+            'toolbar' => [
+                [
+                    'content'=>
+                        Html::a('Inicio', ['/site/index'], ['class' => 'btn btn-primary']) .
+                        ((Yii::$app->user->can('policia-create'))? Html::a('Registrar', ['create'], ['class' => 'btn btn-success']): '' ).
+                        Html::a('<i class="fas fa-redo"></i>', ['index'], ['class' => 'btn btn-primary'])
+                    ,    
+                    'options' => ['class' => 'btn-group']
+                ],
+                //'{export}',
+                ((Yii::$app->user->can('policia-exportar'))? $fullExportMenu : []),
+            ]
+        ]); ?>
+    </div>
 </div>

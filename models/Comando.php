@@ -11,7 +11,7 @@ use Yii;
  * @property int $id_departamento_com
  * @property string $codigo_com
  * @property string $nombre_com
- * @property string $fefcha_com
+ * @property string $fecha_com
  * @property string $estado_com
  */
 class Comando extends \yii\db\ActiveRecord
@@ -30,9 +30,9 @@ class Comando extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_departamento_com', 'codigo_com', 'nombre_com', 'fefcha_com', 'estado_com'], 'required'],
+            [['id_departamento_com', 'codigo_com', 'nombre_com', 'fecha_com', 'estado_com'], 'required'],
             [['id_departamento_com'], 'integer'],
-            [['fefcha_com'], 'safe'],
+            [['fecha_com'], 'safe'],
             [['codigo_com'], 'string', 'max' => 8],
             [['nombre_com'], 'string', 'max' => 64],
             [['estado_com'], 'string', 'max' => 2],
@@ -50,7 +50,7 @@ class Comando extends \yii\db\ActiveRecord
             'id_departamento_com' => 'Id Departamento Com',
             'codigo_com' => 'Codigo Com',
             'nombre_com' => 'Nombre Com',
-            'fefcha_com' => 'Fefcha Com',
+            'fecha_com' => 'Fefcha Com',
             'estado_com' => 'Estado Com',
         ];
     }

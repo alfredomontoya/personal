@@ -96,6 +96,24 @@ a.desc:after {
     border: none;
 }
 
+.mascara
+  {
+    background-color: rgba(0,0,0,0.8);
+    
+    z-index: -1;
+    filter:brightness(0.4);
+    }
+.carousel{
+    z-index: -1;
+}
+.texto_baner{
+    position: relative;
+    z-index: 1;
+    margin-top: -550px;
+   margin-left: 190px;
+   margin-right: 190px;
+
+}
 @media(max-width:767px) {
     .nav li > form > button.logout {
         display:block;

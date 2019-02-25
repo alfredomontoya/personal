@@ -31,9 +31,9 @@ class Detallegrado extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_policia_dg', 'id_grado_dg', 'glosa_dg', 'fecha_dg', 'estado_dg'], 'required'],
+            [['id_policia_dg', 'id_grado_dg', 'glosa_dg', 'fecha_dg', 'estado_dg', 'fechaascenso_dg', ], 'required'],
             [['id_policia_dg', 'id_grado_dg'], 'integer'],
-            [['fechaascenso_dg', 'fecha_dg'], 'safe'],
+            [['fecha_dg'], 'safe'],
             [['glosa_dg'], 'string', 'max' => 256],
             [['estado_dg'], 'string', 'max' => 2],
             [['id_policia_dg'], 'exist', 'skipOnError' => true, 'targetClass' => Policia::className(), 'targetAttribute' => ['id_policia_dg' => 'id_policia']],
@@ -53,7 +53,7 @@ class Detallegrado extends \yii\db\ActiveRecord
             'glosa_dg' => 'Glosa Dg',
             'fechaascenso_dg' => 'Fechaascenso Dg',
             'fecha_dg' => 'Fecha Dg',
-            'estado_dg' => 'Estado Dg',
+            'estado_dg' => 'Estado',
         ];
     }
     

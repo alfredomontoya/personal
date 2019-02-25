@@ -12,6 +12,9 @@ use app\models\ContactForm;
 use app\models\Cliente;
 use app\models\Detalledocumento;
 
+use app\models\FormUpload;
+use yii\web\UploadedFile;
+
 use yii\base\Model;
 
 
@@ -34,7 +37,7 @@ class SiteController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['logout',],
+                        'actions' => ['logout', 'about'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -76,6 +79,44 @@ class SiteController extends Controller
     public function actionIndex()
     {
         return $this->render('index');
+    }
+    
+    /**
+     * Displays homepage.
+     *
+     * @return string
+     */
+    public function actionIndex2()
+    {
+        $model = new FormUpload;
+        $msg = null;
+
+        if ($model->load(Yii::$app->request->post()))
+        {
+            $model->file = UploadedFile::getInstances($model, 'file');
+            $carpeta = '../web';
+            if (!is_dir($carpeta)) {
+                Yii::warning('DIRECTORIO NO ESISTE: ' . $carpeta );
+                \yii\helpers\FileHelper::createDirectory($carpeta, $mode = 0775, $recursive = true);
+                if (file_exists($carpeta)) {
+                    Yii::warning('DIRECTORIO CREADO: ' . $carpeta );
+                }
+                else
+                    Yii::warning('error al crear carpeta');
+            } else {
+                Yii::warning('DIRECTORIO YA ESISTE: ' . $carpeta );
+            }
+
+         if ($model->file && $model->validate()) {
+          foreach ($model->file as $file) {
+           $file->saveAs($carpeta.'/' . $file->baseName . '.' . $file->extension);
+           $msg = $msg . "<br><p><strong class='label label-info'>Enhorabuena, subida realizada con éxito</strong></p>";
+           Yii::warning('Archivo creado: ' . $carpeta.'/' . $file->baseName . '.' . $file->extension);
+          }
+         }
+        }
+        return $this->render("index2", ["model" => $model, "msg" => $msg]);
+        //return $this->render('index2');
     }
 
     /**
@@ -199,5 +240,25 @@ class SiteController extends Controller
                 'model' => $model,   
             ]);
         }
+    }
+    
+    public function actionUpload()
+    {
+
+     $model = new FormUpload;
+     $msg = null;
+
+     if ($model->load(Yii::$app->request->post()))
+     {
+      $model->file = UploadedFile::getInstances($model, 'file');
+
+      if ($model->file && $model->validate()) {
+       foreach ($model->file as $file) {
+        $file->saveAs('archivos/' . $file->baseName . '.' . $file->extension);
+        $msg = "<p><strong class='label label-info'>Enhorabuena, subida realizada con éxito</strong></p>";
+       }
+      }
+     }
+     return $this->render("upload", ["model" => $model, "msg" => $msg]);
     }
 }

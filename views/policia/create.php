@@ -11,30 +11,24 @@ $this->params['breadcrumbs'][] = ['label' => 'Policias', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="policia-create">
-    <div class="panel panel-primary">
+    <div class="container">
+    <div class="panel panel-group">
         <div class="panel-heading">
             <h3><?= Html::encode($this->title) ?></h3>
         </div>
         <div class="panel-body">
             <?= $this->render('_form', [
                 'model' => $model,
-                'grado' => $grado,
-                'grados' => $grados,
-                'detallegrado' => $detallegrado,
                 'imagen' => $imagen,
                 'departamentos' => $departamentos,
                 'ldepartamentos' => $ldepartamentos,
                 'provincias' => $provincias,
                 'lprovincias' => $lprovincias,
+                'directorio' => $directorio,
                 'msg' => $msg,
             ]) ?>
         </div>
-        <div class="panel-footer">
-            @marca
-        </div>
+        
     </div>
-    
-
-    
-
+    </div>
 </div>

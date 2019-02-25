@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use app\models\Policia;
+use app\models\Grado;
 use app\models\PoliciaSearch;
 use app\models\Detallegrado;
 use app\models\DetallegradoSearch;
@@ -14,6 +15,7 @@ use yii\filters\VerbFilter;
 use app\models\Imagen;
 use yii\web\UploadedFile;
 use yii\helpers\ArrayHelper;
+use yii\web\ForbiddenHttpException;
 
 /**
  * PoliciaController implements the CRUD actions for Policia model.
@@ -42,7 +44,8 @@ class PoliciaController extends Controller
                     ],
                 ],
                 'denyCallback' => function ($rule, $action) {
-                    echo "<script>"."location.href ='http://localhost:8084/personal/web/index.php?r=site/login';"."/*alert('Denegado');*/ "."</script>";
+                    $this->redirect(['/site/login']);
+                    //echo "<script>"."location.href ='http://localhost:8080/personal/web/index.php?r=site/login';"."/*alert('Denegado');*/ "."</script>";
                     //$this->redirect(['site/about'], 302);
                     //throw new \Exception('No tienes los suficientes permisos para acceder a esta página');
                 }
@@ -62,6 +65,9 @@ class PoliciaController extends Controller
      */
     public function actionIndex()
     {
+        if(!Yii::$app->user->can('policia-index'))
+            throw new ForbiddenHttpException('Accedo denegado! Consulte con el administrador.');
+
         $searchModel = new PoliciaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -79,11 +85,15 @@ class PoliciaController extends Controller
      */
     public function actionView($id)
     {
+        if(!Yii::$app->user->can('policia-view'))
+            throw new ForbiddenHttpException('Accedo denegado! Consulte con el administrador.');
+
         $model = $this->findModel($id);
-        $detallegrado = Detallegrado::find()->where(['id_policia_dg' => $model->id_policia])->all();
+        //$detallegrado = Detallegrado::find()->where(['id_policia_dg' => $model->id_policia])->all();
+        $imagenpolicia = \app\models\Imagenpolicia::find()->where(['id_policia_imp' => $model->id_policia, 'estado_imp' => 'AC'])->all();
         return $this->render('view', [
             'model' => $model,
-            'detallegrado' => $detallegrado,
+            'imagenpolicia' => $imagenpolicia,
         ]);
     }
 
@@ -94,20 +104,15 @@ class PoliciaController extends Controller
      */
     public function actionCreate($id_departamento=0)
     {
+        if(!Yii::$app->user->can('policia-create'))
+            throw new ForbiddenHttpException('Accedo denegado! Consulte con el administrador.');
+
         $msg = "iniciando... <br>";
         
         $model = new Policia();
         $imagen = new Imagen();
-        $detallegrado = new Detallegrado();
-        $detallegradosearch = new DetallegradoSearch();
-        $grado = new \app\models\Grado();
         $departamento = new \app\models\Departamento();
         $provincia = new \app\models\Provincia();
-        
-        $grados = \app\models\Grado::find()
-                ->select(['descripcion_gra as value', 'id_grado as id', "descripcion_gra as label", 'codigo_gra as codigo_gra'])
-                ->asArray()
-                ->all();
         
         $departamentos= \app\models\Departamento::find()->all();
         $ldepartamentos = ArrayHelper::map($departamentos,'nombre_dep','nombre_dep');
@@ -116,71 +121,56 @@ class PoliciaController extends Controller
         $lprovincias = ArrayHelper::map($provincias,'nombre_prov','nombre_prov');
         
         if ($model->load(Yii::$app->request->post())){
-            $msg = $msg . 'cargado datos policia ok <br>';
-            if ($detallegrado->load(Yii::$app->request->post())){
-                $msg = $msg . 'cargado datos detallegrado ok <br>';
-                $model->estado_pol = 'AC';
-                $imagen->archivo = UploadedFile::getInstance($imagen, 'archivo');
-                if ($model->validate() ) {
-                    $msg = $msg . 'validate policia ok <br>';
-                    
-                    
-                        $msg = $msg . 'validate detallegrado ok <br>';
-                        
-                        if ($model->save()) {
-                            $imagen->archivo->saveAs('policias/' . $model->id_policia . '_foto.' . $imagen->archivo->extension);
-                            $msg = $msg . 'save policia ok <br>';
-                            $detallegrado->id_policia_dg = $model->id_policia;
-                            $detallegrado->fecha_dg = date('y-m-d H:i:s');
-                            $detallegrado->estado_dg='AC';
-                                $msg = $msg . $detallegrado->id_detallegrado. '<br>';
-                                $msg = $msg . $detallegrado->id_policia_dg. '<br>';
-                                $msg = $msg . $detallegrado->id_grado_dg. '<br>';
-                                $msg = $msg . $detallegrado->glosa_dg. '<br>';
-                                $msg = $msg . $detallegrado->fechaascenso_dg. '<br>';
-                                $msg = $msg . $detallegrado->fecha_dg. '<br>';
-                                $msg = $msg . $detallegrado->estado_dg. '<br>';
-                            if ($detallegrado->validate()){
-                                
-                                if ($detallegrado->save())
-                                    $msg = $msg . 'save detallegrado ok <br>';
-                                else
-                                    $msg = $msg . 'save detallegrado err <br>';
+           Yii::warning('cargado datos policia ok <br>');
+            $model->estado_pol = 'AC';
+            $imagen->archivo = UploadedFile::getInstances($imagen, 'archivo');
+            if ($model->validate() ) {
+                Yii::warning('validate policia ok <br>');
 
-                                return $this->redirect([
-                                    'view', 
-                                    'id' => $model->id_policia
-                                    ]);
-                            } else {
-                                $msg = $msg . 'validate detallegrado err <br>';
-                            }
+                if ($model->save()) {
+                    Yii::warning('registro policia ok <br>');
+                    $carpeta = 'policias';
 
-                        } else {
-                            $msg = $msg . 'save policia err <br>';
-                        }
-                    
+                    foreach ($imagen->archivo as $file) {
+                        //$file->saveAs($carpeta. '/' . $file->baseName . '.' . $file->extension);
+                        $imagenpolicia = new \app\models\Imagenpolicia([
+                            'id_policia_imp' => $model->id_policia,
+                            'fecha_imp' => date('y-m-d H:i:s'),
+                            'estado_imp' => 'AC'
+                        ]);
+                        $imagenpolicia->save();
+                        $namefile_imp = $carpeta . '/' . $model->id_policia . '_' . $imagenpolicia->id_imagenpolicia . '.'. $file->extension;
+                        $imagenpolicia->namefile_imp = $namefile_imp;
+                        $imagenpolicia->save();
+                        \Yii::warning('creando imagen: '.$namefile_imp);
+                        $file->saveAs($namefile_imp);
+                        if (file_exists($namefile_imp))
+                            \Yii::warning('imagen creada: '.$namefile_imp);
+                        else
+                            \Yii::warning('imagen NO creada: '.$namefile_imp);
+
+                    }
+                    return $this->redirect(['view', 'id' => $model->id_policia]);
                 } else {
-                    $msg = $msg . 'validate policia err <br>';
-                    throw new \yii\web\HttpException(404, 'The requested Item could not be found.'); 
+                   Yii::warning('save policia err <br>');
                 }
+
             } else {
-                $msg = $msg . 'cargado datos detallegrado err <br>';
+               Yii::warning('validate policia err <br>');
+                throw new \yii\web\HttpException(404, 'The requested Item could not be found.'); 
             }
-            
         } else {
-            $msg = $msg . 'cargado datos policia err <br>';
+           Yii::warning('cargado datos policia err <br>');
         }
 
         return $this->render('create', [
             'model' => $model,
-            'grado' => $grado,
-            'grados' => $grados,
-            'detallegrado' => $detallegrado,
             'imagen' => $imagen,
             'departamentos' => $departamentos,
             'ldepartamentos' => $ldepartamentos,
             'provincias' => $provincias,
             'lprovincias' => $lprovincias,
+            'directorio' => 'default',
             'msg' => $msg,
         ]);
     }
@@ -205,6 +195,11 @@ class PoliciaController extends Controller
         
         echo \app\models\Provincia::find()->where(['id_provincia'=>$id])->one()->nombre_prov;
     }
+    
+    public function actionSeleccionargrado($id=0){
+        
+        echo (!is_null($id))? \app\models\Grado::find()->where(['id_grado'=>$id])->one()->codigo_gra : new Grado();
+    }
 
     /**
      * Updates an existing Policia model.
@@ -215,11 +210,13 @@ class PoliciaController extends Controller
      */
     public function actionUpdate($id, $id_departamento=0)
     {
+        if(!Yii::$app->user->can('policia-update'))
+            throw new ForbiddenHttpException('Accedo denegado! Consulte con el administrador.');
+
         $model = $this->findModel($id);
+//        $directorio = opendir('web/policias');
         $imagen = new Imagen();
         //yii\helpers\File
-        $detallegrado = Detallegrado::findOne(['id_policia_dg' => $model->id_policia, 'estado_dg' => 'AC']);
-        
         
         /*************/////////////////
         $msg = "iniciando... <br>";
@@ -227,10 +224,6 @@ class PoliciaController extends Controller
         //$departamento = new \app\models\Departamento();
         //$provincia = new \app\models\Provincia();
         
-        $grados = \app\models\Grado::find()
-                ->select(['codigo_gra as value', 'id_grado as id', "codigo_gra as label", 'descripcion_gra as descripcion_gra'])
-                ->asArray()
-                ->all();
         
         $departamentos= \app\models\Departamento::find()->all();
         $ldepartamentos = ArrayHelper::map($departamentos,'nombre_dep','nombre_dep');
@@ -239,32 +232,45 @@ class PoliciaController extends Controller
         $provincias = \app\models\Provincia::find()->joinWith(['departamentoProv dep'], true, 'INNER JOIN')->where(['dep.nombre_dep' => $model->dptonacimiento_pol])->all();
         $lprovincias = ArrayHelper::map($provincias,'nombre_prov','nombre_prov');
         ////////////////*////
+        //$detallegradosearch = new DetallegradoSearch();
         
-        $detallegradosearch = new DetallegradoSearch();
-        $grado = \app\models\Grado::findOne(['id_grado' => $detallegrado->id_grado_dg]);
-        
-        $grados = \app\models\Grado::find()
-                ->select(['codigo_gra as value', 'id_grado as id', "codigo_gra as label", 'descripcion_gra as descripcion_gra'])
-                ->asArray()
-                ->all();
-        
-        if ($model->load(Yii::$app->request->post())&& $detallegrado->load(Yii::$app->request->post()) && $model->save() && $detallegrado->save()) {
-            $imagen->archivo = UploadedFile::getInstance($imagen, 'archivo');
-            $imagen->archivo->saveAs('policias/' . $model->id_policia . '_foto.' . $imagen->archivo->extension);
-            
-            return $this->redirect(['view', 'id' => $model->id_policia]);
-        }
+        if ($model->load(Yii::$app->request->post()))
+            if ($model->save()){
+                $carpeta = 'policias';
+                $imagen->archivo = UploadedFile::getInstances($imagen, 'archivo');
+                foreach ($imagen->archivo as $file) {
+                    //$file->saveAs($carpeta. '/' . $file->baseName . '.' . $file->extension);
+                    $imagenpolicia = new \app\models\Imagenpolicia([
+                        'id_policia_imp' => $model->id_policia,
+                        'fecha_imp' => date('y-m-d H:i:s'),
+                        'estado_imp' => 'AC'
+                    ]);
+                    $imagenpolicia->save();
+                    $namefile_imp = $carpeta . '/' . $model->id_policia . '_' . $imagenpolicia->id_imagenpolicia . '.'. $file->extension;
+                    $imagenpolicia->namefile_imp = $namefile_imp;
+                    $imagenpolicia->save();
+                    \Yii::warning('creando imagen: '.$namefile_imp);
+                    $file->saveAs($namefile_imp);
+                    if (file_exists($namefile_imp))
+                        \Yii::warning('imagen creada: '.$namefile_imp);
+                    else
+                        \Yii::warning('imagen NO creada: '.$namefile_imp);
+
+                }
+                return $this->redirect(['view', 'id' => $model->id_policia]);
+                
+            } else
+                Yii::warning ('policia registro err!');
+
 
         return $this->render('update', [
              'model' => $model,
-            'grado' => $grado,
-            'grados' => $grados,
-            'detallegrado' => $detallegrado,
             'imagen' => $imagen,
             'departamentos' => $departamentos,
             'ldepartamentos' => $ldepartamentos,
             'provincias' => $provincias,
             'lprovincias' => $lprovincias,
+            'directorio' => 'policias',
             'msg' => $msg,
         ]);
     }
@@ -278,9 +284,9 @@ class PoliciaController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        //$this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        //return $this->redirect(['index']);
     }
 
     /**

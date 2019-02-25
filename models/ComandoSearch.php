@@ -20,7 +20,7 @@ class ComandoSearch extends Comando
     {
         return [
             [['id_comando', 'id_departamento_com'], 'integer'],
-            [['codigo_com', 'nombre_com', 'fefcha_com', 'estado_com'], 'safe'],
+            [['codigo_com', 'nombre_com', 'fecha_com', 'estado_com'], 'safe'],
             [['nombre_dep',], 'safe'],
         ];
     }
@@ -45,16 +45,21 @@ class ComandoSearch extends Comando
     {
         $query = Comando::find();
 
-        $query->joinWith('departamentoCom');
+        $query->join('LEFT OUTER JOIN', 'departamento', 'comando.id_departamento_com = departamento.id_departamento')
+                ;
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+        
+        $dataProvider->sort->attributes['nombre_dep'] = [
+            'asc' => ['departamento.nombre_dep' => SORT_ASC], 
+            'desc' => ['departamento.nombre_dep' => SORT_DESC]
+            ];
+ 
 
-        $this->load($params);
-
-        if (!$this->validate()) {
+        if (!($this->load($params) && $this->validate())) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
@@ -64,7 +69,7 @@ class ComandoSearch extends Comando
         $query->andFilterWhere([
             'id_comando' => $this->id_comando,
             'id_departamento_com' => $this->id_departamento_com,
-            'fefcha_com' => $this->fefcha_com,
+            'fecha_com' => $this->fecha_com,
         ]);
 
         $query->andFilterWhere(['like', 'codigo_com', $this->codigo_com])

@@ -13,6 +13,7 @@ use app\models\Cargo;
 class CargoSearch extends Cargo
 {
     public $nombre_uni;
+    public $nombre_com;
     
     /**
      * {@inheritdoc}
@@ -22,7 +23,7 @@ class CargoSearch extends Cargo
         return [
             [['id_cargo', 'id_unidad_car'], 'integer'],
             [['nombre_car', 'estado_car'], 'safe'],
-            [['nombre_uni', ], 'safe'],
+            [['nombre_uni', 'nombre_com', ], 'safe'],
         ];
     }
 
@@ -46,13 +47,24 @@ class CargoSearch extends Cargo
     {
         $query = Cargo::find();
         
-        $query->joinWith('unidadCar');
-
+        $query->join('LEFT OUTER JOIN', 'unidad', 'cargo.id_unidad_car = unidad.id_unidad')
+                ->join('LEFT OUTER JOIN', 'comando', 'unidad.id_comando_uni = comando.id_comando')
+                ;
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+        
+        $dataProvider->sort->attributes['nombre_uni'] = [
+            'asc' => ['unidad.nombre_uni' => SORT_ASC], 
+            'desc' => ['unidad.nombre_uni' => SORT_DESC]
+            ];
+        
+        $dataProvider->sort->attributes['nombre_com'] = [
+            'asc' => ['comando.nombre_com' => SORT_ASC], 
+            'desc' => ['comando.nombre_com' => SORT_DESC]
+            ];
 
         $this->load($params);
 
@@ -71,6 +83,7 @@ class CargoSearch extends Cargo
         $query->andFilterWhere(['like', 'nombre_car', $this->nombre_car])
             ->andFilterWhere(['like', 'estado_car', $this->estado_car])
             ->andFilterWhere(['like', 'unidad.nombre_uni', $this->nombre_uni])
+            ->andFilterWhere(['like', 'comando.nombre_com', $this->nombre_com])
                 ;
 
         return $dataProvider;

@@ -3,11 +3,16 @@
 namespace app\controllers;
 
 use Yii;
+use yii\filters\AccessControl;
 use app\models\Comando;
+use app\models\Departamento;
 use app\models\ComandoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers;
+use yii\helpers\ArrayHelper;
+use yii\web\ForbiddenHttpException;
 
 /**
  * ComandoController implements the CRUD actions for Comando model.
@@ -20,6 +25,28 @@ class ComandoController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'create', 'update', 'view', '_form', '_search'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['*'],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'create', 'createcambiocargo', 'createcambioexterno', 'update', 'view', '_form', '_search'],
+                        'roles' => ['@'],
+                    ],
+                ],
+                'denyCallback' => function ($rule, $action) {
+                    $this->redirect(['/site/login']);
+                    //echo "<script>"."location.href ='http://localhost:8080/personal/web/index.php?r=site/login';"."/*alert('Denegado');*/ "."</script>";
+                    //$this->redirect(['site/about'], 302);
+                    //throw new \Exception('No tienes los suficientes permisos para acceder a esta página');
+                }
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -35,13 +62,17 @@ class ComandoController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ComandoSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if(Yii::$app->user->can('comando-index')){
+            $searchModel = new ComandoSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('Accedo denegado! Consulte con el administrador.');
+        }
     }
 
     /**
@@ -52,9 +83,14 @@ class ComandoController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if(Yii::$app->user->can('comando-view')){
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        } else {
+            throw new ForbiddenHttpException('Accedo denegado! Consulte con el administrador.');
+        }
+        
     }
 
     /**
@@ -64,15 +100,28 @@ class ComandoController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Comando();
+        if(Yii::$app->user->can('comando-create')){
+            $model = new Comando();
+            $model->estado_com = 'AC';
+            $model->fecha_com = date('Y-m-d H:i');
+            
+            $departamentos= \app\models\Departamento::find()->all();
+            $ldepartamentos = ArrayHelper::map($departamentos,'id_departamento','nombre_dep');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id_comando]);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                $model->fecha_com = date('Y-m-d H:i');
+                return $this->redirect(['view', 'id' => $model->id_comando]);
+            }
+
+            return $this->render('create', [
+                'model' => $model,
+                'departamentos' => $departamentos,
+                'ldepartamentos' => $ldepartamentos,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('acceso Denegado');
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        
     }
 
     /**
@@ -84,15 +133,25 @@ class ComandoController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if(Yii::$app->user->can('comando-index')){
+            $model = $this->findModel($id);
+        
+            $departamentos= \app\models\Departamento::find()->all();
+            $ldepartamentos = ArrayHelper::map($departamentos,'id_departamento','nombre_dep');
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id_comando]);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id_comando]);
+            }
+
+            return $this->render('update', [
+                'model' => $model,
+                'departamentos' => $departamentos,
+                'ldepartamentos' => $ldepartamentos,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('Accedo denegado! Consulte con el administrador.');
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        
     }
 
     /**
@@ -104,9 +163,9 @@ class ComandoController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        //$this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        //return $this->redirect(['index']);
     }
 
     /**

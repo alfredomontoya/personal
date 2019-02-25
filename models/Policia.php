@@ -32,6 +32,7 @@ use Yii;
  */
 class Policia extends \yii\db\ActiveRecord
 {
+    public $nombrecompleto_pol;
     /**
      * {@inheritdoc}
      */
@@ -47,7 +48,7 @@ class Policia extends \yii\db\ActiveRecord
     {
         return [
             [['expescalafon_pol', 'ci_pol', 'exp_pol', 'paterno_pol', 'nombre1_pol', 'sexo_pol', 'fnacimiento_pol', 'estado_pol'], 'required'],
-            [['escalafon_pol', 'fnacimiento_pol', 'fincorporacion_pol', 'fpresentacion_pol'], 'safe'],
+            [['escalafon_pol', 'fnacimiento_pol', 'fincorporacion_pol', 'fpresentacion_pol', 'nombrecompleto_pol'], 'safe'],
             [['escalafon_pol', 'ci_pol', 'telefono_pol', 'telefonoref_pol'], 'string', 'max' => 16],
             [['expescalafon_pol', 'exp_pol', 'sexo_pol', 'trabajosantacruz_pol'], 'string', 'max' => 4],
             [['paterno_pol', 'materno_pol', 'esposo_pol', 'nombre1_pol', 'nombre2_pol'], 'string', 'max' => 32],
@@ -73,6 +74,7 @@ class Policia extends \yii\db\ActiveRecord
             'esposo_pol' => 'Esposo Pol',
             'nombre1_pol' => 'Nombre1 Pol',
             'nombre2_pol' => 'Nombre2 Pol',
+            'nombrecompleto_pol' => 'Nombres y apellidos',
             'sexo_pol' => 'Sexo Pol',
             'fnacimiento_pol' => 'Fnacimiento Pol',
             'dptonacimiento_pol' => 'Dptonacimiento Pol',

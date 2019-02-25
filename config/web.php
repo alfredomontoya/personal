@@ -21,8 +21,8 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
+            'identityClass' => 'app\models\BackendUser',
+            'enableAutoLogin' => false,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -42,6 +42,11 @@ $config = [
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+        'authManager' =>
+        [
+            'class' => 'yii\rbac\DbManager',
+            'defaultRoles' => ['guest']
         ],
         
         'db' => $db,
